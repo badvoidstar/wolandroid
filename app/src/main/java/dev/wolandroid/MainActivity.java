@@ -72,6 +72,7 @@ public final class MainActivity extends Activity {
     private ProgressBar progress;
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_main);
@@ -104,7 +105,8 @@ public final class MainActivity extends Activity {
         refreshButton.setOnClickListener(view -> {
             if (scan != null) {
                 stopScan();
-                status.setText(getString(R.string.scan_stopped, devices.size()));
+                status.setText(getResources().getQuantityString(
+                        R.plurals.scan_stopped, devices.size(), devices.size()));
                 persist();
             } else {
                 refreshNetwork(true);
@@ -300,7 +302,8 @@ public final class MainActivity extends Activity {
                 main.post(() -> {
                     if (!started || token != generation) return;
                     progress.setProgress(completed * 100 / total);
-                    status.setText(getString(R.string.scanning, completed, total, devices.size()));
+                    status.setText(getResources().getQuantityString(
+                            R.plurals.scanning, total, completed, total, devices.size()));
                 });
             }
 
@@ -309,7 +312,8 @@ public final class MainActivity extends Activity {
                 main.post(() -> {
                     if (!started || token != generation) return;
                     stopScan();
-                    status.setText(getString(R.string.scan_complete, devices.size()));
+                    status.setText(getResources().getQuantityString(
+                            R.plurals.scan_complete, devices.size(), devices.size()));
                     persist();
                 });
             }
@@ -348,7 +352,8 @@ public final class MainActivity extends Activity {
 
     private void options(Device device) {
         stopScan();
-        status.setText(getString(R.string.scan_stopped, devices.size()));
+        status.setText(getResources().getQuantityString(
+                R.plurals.scan_stopped, devices.size(), devices.size()));
         persist();
         new AlertDialog.Builder(this).setTitle(device.name.isEmpty() ? device.ip : device.name)
                 .setItems(new String[]{getString(R.string.wake_now), getString(R.string.create_shortcut),
@@ -367,7 +372,8 @@ public final class MainActivity extends Activity {
     private void edit(Device previous, Consumer<Device> afterSave) {
         if (subnet == null) return;
         stopScan();
-        status.setText(getString(R.string.scan_stopped, devices.size()));
+        status.setText(getResources().getQuantityString(
+                R.plurals.scan_stopped, devices.size(), devices.size()));
         String editingSubnet = subnet.toString();
         LinearLayout form = new LinearLayout(this);
         form.setOrientation(LinearLayout.VERTICAL);
@@ -459,12 +465,20 @@ public final class MainActivity extends Activity {
             edit(device, this::pin);
             return;
         }
-        try {
-            WakeShortcuts.pin(this, device, store);
-            Toast.makeText(this, R.string.shortcut_requested, Toast.LENGTH_LONG).show();
-        } catch (IOException | IllegalArgumentException | IllegalStateException | SecurityException error) {
-            showError(error);
-        }
+        wakeWorker.execute(() -> {
+            try {
+                WakeShortcuts.pin(getApplicationContext(), device, store);
+                main.post(() -> {
+                    if (!isDestroyed()) {
+                        Toast.makeText(this, R.string.shortcut_requested, Toast.LENGTH_LONG).show();
+                    }
+                });
+            } catch (IOException | IllegalArgumentException | IllegalStateException | SecurityException error) {
+                main.post(() -> {
+                    if (!isDestroyed()) showError(error);
+                });
+            }
+        });
     }
 
     private void showError(Exception error) {

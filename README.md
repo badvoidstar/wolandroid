@@ -86,14 +86,14 @@ MAC on an arbitrary Wi-Fi network or VPN:
 
 Only scan networks you own or have permission to scan. The app requires only
 `INTERNET` and `ACCESS_NETWORK_STATE`, not location or contact access. It targets
-Android API 35; newer Android versions or device-specific network policy may
+Android API 36; newer Android versions or device-specific network policy may
 restrict local-network access. See the in-app help for the same limitations.
 
 ## GitHub CI/CD
 
 `.github/workflows/android.yml` runs for pushes to **all branches**, pull requests
-and manual dispatches. Every run provisions JDK 17 and Android SDK 35, then uses
-the Gradle 8.11.1 wrapper to run the same release unit tests, Android lint,
+and manual dispatches. Every run provisions JDK 17 and Android SDK 36, then uses
+the Gradle 9.9.0 wrapper to run the same release unit tests, Android lint,
 release APK build, APK signature verification and alignment check.
 
 Only non-PR runs on `main` retain the APK and publish a versioned GitHub release,
@@ -134,9 +134,11 @@ removed in an always-run cleanup step. Branches use development signing.
 
 ### Local development
 
-Use JDK 17 and Android SDK platform 35/build-tools 35.0.0.
+Use JDK 17 and Android SDK platform 36/build-tools 36.0.0.
 Set `ANDROID_HOME` or create an ignored `local.properties` with `sdk.dir=...`.
-The checked-in wrapper downloads Gradle 8.11.1.
+The checked-in wrapper downloads Gradle 9.9.0. The build uses Android Gradle
+Plugin 9.5.1, JUnit 4.13.2 and Robolectric 4.17; dependency updates use stable
+releases rather than preview versions.
 
 ```sh
 ./gradlew --no-daemon :app:testReleaseUnitTest :app:lintRelease :app:assembleRelease
