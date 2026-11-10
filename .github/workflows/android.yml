@@ -59,7 +59,7 @@ jobs:
           WOL_KEYSTORE_PASSWORD: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && secrets.ANDROID_KEYSTORE_PASSWORD || '' }}
           WOL_KEY_ALIAS: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && secrets.ANDROID_KEY_ALIAS || '' }}
           WOL_KEY_PASSWORD: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && secrets.ANDROID_KEY_PASSWORD || '' }}
-        run: ./gradlew --no-daemon --stacktrace :app:testReleaseUnitTest :app:lintRelease :app:assembleRelease
+        run: ./gradlew --no-daemon --continue --stacktrace :app:testReleaseUnitTest :app:lintRelease :app:assembleRelease
       - name: Verify installable APK
         shell: bash
         run: |
