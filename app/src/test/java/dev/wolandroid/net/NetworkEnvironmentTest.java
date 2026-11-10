@@ -62,8 +62,11 @@ public class NetworkEnvironmentTest {
         String interfaceName = vpn ? "tun0" : "wlan0";
         LinkProperties properties = new LinkProperties();
         properties.setInterfaceName(interfaceName);
+        Ipv4Subnet linkSubnet = Ipv4Subnet.parse(link);
+        InetAddress linkIp = Ipv4Subnet.toInetAddress(Ipv4Subnet.parseAddress(link.split("/")[0]));
         LinkAddress address = ReflectionHelpers.callConstructor(LinkAddress.class,
-                ClassParameter.from(String.class, link));
+                ClassParameter.from(InetAddress.class, linkIp),
+                ClassParameter.from(int.class, linkSubnet.prefix()));
         ReflectionHelpers.callInstanceMethod(properties, "addLinkAddress",
                 ClassParameter.from(LinkAddress.class, address));
         Ipv4Subnet range = Ipv4Subnet.parse(route);
