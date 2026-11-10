@@ -60,6 +60,14 @@ jobs:
           WOL_KEY_ALIAS: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && secrets.ANDROID_KEY_ALIAS || '' }}
           WOL_KEY_PASSWORD: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && secrets.ANDROID_KEY_PASSWORD || '' }}
         run: ./gradlew --no-daemon --continue --stacktrace :app:testReleaseUnitTest :app:lintRelease :app:assembleRelease
+      - name: Show lint diagnostics
+        if: always()
+        shell: bash
+        run: |
+          report=app/build/intermediates/lint_intermediate_text_report/release/lintReportRelease/lint-results-release.txt
+          if [[ -f "$report" ]]; then
+            cat "$report"
+          fi
       - name: Verify installable APK
         shell: bash
         run: |
@@ -117,6 +125,7 @@ jobs:
           set -euo pipefail
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" dist/*.apk dist/SHA256SUMS --clobber
+            gh release edit "$TAG" --notes-file dist/RELEASE_NOTES.txt
           else
             gh release create "$TAG" dist/*.apk dist/SHA256SUMS \
               --target "$GITHUB_SHA" --title "WOLAndroid ${TAG#v}" \

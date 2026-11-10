@@ -123,7 +123,10 @@ public final class MainActivity extends Activity {
         ConnectivityManager manager = getSystemService(ConnectivityManager.class);
         if (manager != null) {
             try {
-                NetworkRequest request = new NetworkRequest.Builder().clearCapabilities()
+                NetworkRequest request = new NetworkRequest.Builder()
+                        .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+                        .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+                        .removeCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
                         .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
                         .addTransportType(NetworkCapabilities.TRANSPORT_VPN).build();
                 manager.registerNetworkCallback(request, networkCallback);
