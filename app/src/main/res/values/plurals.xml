@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="scanning">
+        <item quantity="one">Scanning %1$d / %2$d address · %3$d found</item>
+        <item quantity="other">Scanning %1$d / %2$d addresses · %3$d found</item>
+    </plurals>
+    <plurals name="scan_complete">
+        <item quantity="one">Scan complete · %1$d device, including saved entries</item>
+        <item quantity="other">Scan complete · %1$d devices, including saved entries</item>
+    </plurals>
+    <plurals name="scan_stopped">
+        <item quantity="one">Scan stopped · %1$d device</item>
+        <item quantity="other">Scan stopped · %1$d devices</item>
+    </plurals>
+</resources>

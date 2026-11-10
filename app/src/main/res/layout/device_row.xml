@@ -6,7 +6,7 @@
     android:paddingVertical="12dp" android:descendantFocusability="blocksDescendants">
     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
         android:layout_weight="34" android:orientation="vertical"
-        android:paddingEnd="6dp">
+        android:paddingHorizontal="6dp">
         <TextView android:id="@+id/name" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:textSize="14sp"
             android:textStyle="bold" android:textColor="@color/ink"
@@ -17,7 +17,7 @@
     </LinearLayout>
     <TextView android:id="@+id/mac" android:layout_width="0dp"
         android:layout_height="wrap_content" android:layout_weight="38"
-        android:paddingEnd="4dp" android:textSize="11sp"
+        android:paddingHorizontal="4dp" android:textSize="11sp"
         android:fontFamily="monospace" android:textColor="@color/ink"
         android:textDirection="ltr" />
     <TextView android:id="@+id/ip" android:layout_width="0dp"
