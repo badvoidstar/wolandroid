@@ -73,7 +73,8 @@ public class NetworkEnvironmentTest {
         IpPrefix prefix = new IpPrefix(Ipv4Subnet.toInetAddress(range.firstHost()), range.prefix());
         properties.addRoute(ReflectionHelpers.callConstructor(RouteInfo.class,
                 ClassParameter.from(IpPrefix.class, prefix),
-                ClassParameter.from(InetAddress.class, null),
+                // Older Android's implicit Inet4Address.ANY constant is absent from the desktop JVM.
+                ClassParameter.from(InetAddress.class, Ipv4Subnet.toInetAddress(0)),
                 ClassParameter.from(String.class, interfaceName)));
         Network network = Network.fromNetworkHandle(0x0000002acafed00dL);
         return new NetworkEnvironment(network, vpn, properties);
