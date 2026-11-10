@@ -8,6 +8,7 @@ import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.RouteInfo;
+import android.os.Build;
 
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -50,7 +51,7 @@ public final class NetworkEnvironment {
             List<Ipv4Subnet> routed = new ArrayList<>();
             for (RouteInfo route : routes) {
                 IpPrefix destination = route.getDestination();
-                if (route.getType() == RouteInfo.RTN_UNICAST
+                if (isUnicast(route)
                         && destination.getAddress() instanceof Inet4Address
                         && destination.getPrefixLength() > 0 && destination.getPrefixLength() < 31) {
                     routed.add(new Ipv4Subnet(
@@ -101,7 +102,7 @@ public final class NetworkEnvironment {
         long destination = savedSubnet.prefix() < 31 ? savedSubnet.broadcast() : ip;
         InetAddress address = Ipv4Subnet.toInetAddress(destination);
         for (RouteInfo route : routes) {
-            if (route.getType() == RouteInfo.RTN_UNICAST && route.getDestination().contains(address)) {
+            if (isUnicast(route) && route.getDestination().contains(address)) {
                 return destination;
             }
         }
@@ -111,7 +112,7 @@ public final class NetworkEnvironment {
     public boolean canScan(Ipv4Subnet subnet) {
         if (vpn) {
             for (RouteInfo route : routes) {
-                if (route.getType() == RouteInfo.RTN_UNICAST
+                if (isUnicast(route)
                         && route.getDestination().contains(Ipv4Subnet.toInetAddress(subnet.firstHost()))
                         && route.getDestination().contains(Ipv4Subnet.toInetAddress(subnet.lastHost()))) {
                     return true;
@@ -123,5 +124,11 @@ public final class NetworkEnvironment {
             if (local.contains(subnet.firstHost()) && local.contains(subnet.lastHost())) return true;
         }
         return false;
+    }
+
+    private static boolean isUnicast(RouteInfo route) {
+        // Route types are not exposed by the public API before Android 13.
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+                || route.getType() == RouteInfo.RTN_UNICAST;
     }
 }

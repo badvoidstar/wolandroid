@@ -24,7 +24,7 @@ import org.robolectric.util.ReflectionHelpers.ClassParameter;
 import dev.wolandroid.Device;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(sdk = 35)
+@Config(sdk = {26, 35})
 public class NetworkEnvironmentTest {
     @Test
     public void wifiUsesTheRealInterfacePrefixAndRejectsOffSubnetTargets() throws IOException {
