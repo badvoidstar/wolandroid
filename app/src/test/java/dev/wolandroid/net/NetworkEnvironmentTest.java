@@ -12,11 +12,14 @@ import android.net.Network;
 import android.net.RouteInfo;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.util.ReflectionHelpers;
+import org.robolectric.util.ReflectionHelpers.ClassParameter;
 
 import dev.wolandroid.Device;
 
@@ -59,8 +62,14 @@ public class NetworkEnvironmentTest {
         String interfaceName = vpn ? "tun0" : "wlan0";
         LinkProperties properties = new LinkProperties();
         properties.setInterfaceName(interfaceName);
-        properties.addLinkAddress(new LinkAddress(link));
-        properties.addRoute(new RouteInfo(new IpPrefix(route), null, interfaceName));
+        properties.addLinkAddress(ReflectionHelpers.callConstructor(LinkAddress.class,
+                ClassParameter.from(String.class, link)));
+        Ipv4Subnet range = Ipv4Subnet.parse(route);
+        IpPrefix prefix = new IpPrefix(Ipv4Subnet.toInetAddress(range.firstHost()), range.prefix());
+        properties.addRoute(ReflectionHelpers.callConstructor(RouteInfo.class,
+                ClassParameter.from(IpPrefix.class, prefix),
+                ClassParameter.from(InetAddress.class, null),
+                ClassParameter.from(String.class, interfaceName)));
         Network network = Network.fromNetworkHandle(0x0000002acafed00dL);
         return new NetworkEnvironment(network, vpn, properties);
     }

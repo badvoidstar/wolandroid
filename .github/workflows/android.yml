@@ -15,24 +15,24 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       VERSION_CODE: ${{ github.run_number }}
       VERSION_NAME: 1.0.${{ github.run_number }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-java@v6.2.0
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v4.0.4
         with:
           packages: 'platform-tools'
           log-accepted-android-sdk-licenses: false
       - name: Install Android platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6.4.1
       - name: Prepare optional release signing
         env:
           KEYSTORE_BASE64: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && secrets.ANDROID_KEYSTORE_BASE64 || '' }}
@@ -84,7 +84,7 @@ jobs:
           printf 'Discovery cannot reveal every device or MAC address on modern Android. See README.md and in-app help for DNS, VPN and WOL prerequisites.\n\nSource commit: %s\n' "$GITHUB_SHA" >> dist/RELEASE_NOTES.txt
       - name: Retain main APK
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: WOLAndroid-${{ env.VERSION_NAME }}
           path: dist/
@@ -98,12 +98,12 @@ jobs:
   publish:
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.2
         with:
           name: WOLAndroid-1.0.${{ github.run_number }}
           path: dist
