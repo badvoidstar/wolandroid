@@ -1,0 +1,54 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'dev.wolandroid'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'dev.wolandroid'
+        minSdk 26
+        targetSdk 35
+        versionCode (System.getenv('VERSION_CODE') ?: '1').toInteger()
+        versionName System.getenv('VERSION_NAME') ?: '1.0.0'
+    }
+
+    signingConfigs {
+        if (System.getenv('WOL_KEYSTORE_FILE')) {
+            release {
+                storeFile file(System.getenv('WOL_KEYSTORE_FILE'))
+                storePassword System.getenv('WOL_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('WOL_KEY_ALIAS')
+                keyPassword System.getenv('WOL_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            // A fresh checkout can produce a sideloadable APK without private signing keys.
+            signingConfig System.getenv('WOL_KEYSTORE_FILE') ?
+                    signingConfigs.release : signingConfigs.debug
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
+
+    lint {
+        abortOnError true
+    }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+}
