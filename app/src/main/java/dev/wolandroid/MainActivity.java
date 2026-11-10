@@ -465,12 +465,20 @@ public final class MainActivity extends Activity {
             edit(device, this::pin);
             return;
         }
-        try {
-            WakeShortcuts.pin(this, device, store);
-            Toast.makeText(this, R.string.shortcut_requested, Toast.LENGTH_LONG).show();
-        } catch (IOException | IllegalArgumentException | IllegalStateException | SecurityException error) {
-            showError(error);
-        }
+        wakeWorker.execute(() -> {
+            try {
+                WakeShortcuts.pin(getApplicationContext(), device, store);
+                main.post(() -> {
+                    if (!isDestroyed()) {
+                        Toast.makeText(this, R.string.shortcut_requested, Toast.LENGTH_LONG).show();
+                    }
+                });
+            } catch (IOException | IllegalArgumentException | IllegalStateException | SecurityException error) {
+                main.post(() -> {
+                    if (!isDestroyed()) showError(error);
+                });
+            }
+        });
     }
 
     private void showError(Exception error) {
