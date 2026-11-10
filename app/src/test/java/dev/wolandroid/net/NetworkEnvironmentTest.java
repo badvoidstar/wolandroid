@@ -76,7 +76,8 @@ public class NetworkEnvironmentTest {
                 // Older Android's implicit Inet4Address.ANY constant is absent from the desktop JVM.
                 ClassParameter.from(InetAddress.class, Ipv4Subnet.toInetAddress(0)),
                 ClassParameter.from(String.class, interfaceName)));
-        Network network = Network.fromNetworkHandle(0x0000002acafed00dL);
+        Network network = ReflectionHelpers.callConstructor(Network.class,
+                ClassParameter.from(int.class, 42));
         return new NetworkEnvironment(network, vpn, properties);
     }
 
